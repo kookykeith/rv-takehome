@@ -1,6 +1,7 @@
 import z from "zod";
 import { Deal } from "../entities/deals/Deal";
 import { DealDataSchema } from "../entities/deals/interface";
+import { Repository } from "typeorm";
 
 export async function validateAndSaveDeal(
   deal: any,
@@ -48,4 +49,57 @@ async function checkForDuplicateDeal(
   dealRepository: any
 ): Promise<Deal | null> {
   return await dealRepository.findOneBy({ deal_id });
+}
+
+export async function queryDealsCount(dealRepository: Repository<Deal>, filters: {
+  stage: string
+  transportation_mode: string | null,
+  sales_rep: string | null,
+  min_value: number | null,
+  max_value: number | null,
+  min_date: string | null,
+  max_date: string | null
+}) {
+  let queryBuilder = dealRepository.createQueryBuilder('deal');
+
+  queryBuilder = queryBuilder.andWhere('deal.stage = :stage',
+    { stage: filters.stage });
+  
+  if (filters.transportation_mode) {
+    queryBuilder = queryBuilder.andWhere('deal.transportation_mode = :transportation_mode',
+      { transportation_mode: filters.transportation_mode });
+  }
+
+  if (filters.sales_rep) {
+    queryBuilder = queryBuilder.andWhere('deal.sales_rep = :sales_rep',
+      { sales_rep: filters.sales_rep });
+  }
+
+  if (filters.min_value) {
+    const minValue = parseFloat(filters.min_value);
+    if (!isNaN(minValue)) {
+      queryBuilder = queryBuilder.andWhere('deal.value >= :min_value',
+        { min_value: minValue });
+    }
+  }
+
+  if (filters.max_value) {
+    const maxValue = parseFloat(filters.max_value);
+    if (!isNaN(maxValue)) {
+      queryBuilder = queryBuilder.andWhere('deal.value <= :max_value',
+        { max_value: maxValue });
+    }
+  }
+
+  if (filters.min_date) {
+    queryBuilder = queryBuilder.andWhere('deal.created_date >= :min_date',
+      { min_date: filters.min_date });
+  }
+
+  if (filters.max_date) {
+    queryBuilder = queryBuilder.andWhere('deal.created_date <= :max_date',
+      { max_date: filters.max_date });
+  }
+
+  return queryBuilder.getCount();
 }
