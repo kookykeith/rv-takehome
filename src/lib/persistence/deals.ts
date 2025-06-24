@@ -76,7 +76,7 @@ export async function queryDealsCount(dealRepository: Repository<Deal>, filters:
   }
 
   if (filters.min_value) {
-    const minValue = parseFloat(filters.min_value);
+    const minValue = filters.min_value;
     if (!isNaN(minValue)) {
       queryBuilder = queryBuilder.andWhere('deal.value >= :min_value',
         { min_value: minValue });
@@ -84,7 +84,7 @@ export async function queryDealsCount(dealRepository: Repository<Deal>, filters:
   }
 
   if (filters.max_value) {
-    const maxValue = parseFloat(filters.max_value);
+    const maxValue = filters.max_value;
     if (!isNaN(maxValue)) {
       queryBuilder = queryBuilder.andWhere('deal.value <= :max_value',
         { max_value: maxValue });
