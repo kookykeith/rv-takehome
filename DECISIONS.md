@@ -1,0 +1,6 @@
+# Historical Analysis API
+The description mentioned an API so I assumed it would be made available for third party integration but also called from some sort of dashboard in UI. Since the use case wasn't clear, I made each field optional so it would be more flexible. The win rate is the number of closed_won deals out of the total closed deals (closed_won + closed_lost) that match the filters.
+
+# Revenue Forecasting Algorithm
+I took too much time with the Historical Analysis API and did this one in a hurry. To simplify it, I'm relying on the caller to pass in the list of Deals that are expected to close within the month in the pipeline. I assumed the "probability" field for each Deal is the sales_rep's confidence of winning the deal. 
+To calculate the expected revenue from the list of Deals, I summed up the value for all the "closed_won" deals, then added the expected closing revenue for the open ones. The expected closing revenue for each deal is calculated by a weighted average of the sale rep's confidence percentage and the historical win rate for that mode (70% sale rep, 30% historical). The sale rep percentage was weighted more because they should should know how the nuances of the deal affects the win rate. I chose the transportation mode arbitrarily for the historical win rate because I don't know enough about the sales patterns.
